@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Techfest 2026 — Cyborg Edition</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cyan: #00f5ff;
+    --purple: #7b2ff7;
+    --dark: #020b18;
+    --darker: #010810;
+    --grid: rgba(0,245,255,0.04);
+    --glow: 0 0 20px rgba(0,245,255,0.4);
+    --glow-strong: 0 0 40px rgba(0,245,255,0.6), 0 0 80px rgba(0,245,255,0.2);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--dark);
+    color: #c8e8ff;
+    font-family: 'Exo 2', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    width: 16px; height: 16px;
+    border: 1.5px solid var(--cyan);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.1s, opacity 0.2s;
+    mix-blend-mode: screen;
+  }
+  .cursor-dot {
+    width: 4px; height: 4px;
+    background: var(--cyan);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 50px 50px;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* Scan line overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.08) 2px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 20px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(180deg, rgba(2,11,24,0.95) 0%, transparent 100%);
+    border-bottom: 1px solid rgba(0,245,255,0.08);
+  }
+
+  .nav-logo {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--cyan);
+    text-shadow: var(--glow);
+    letter-spacing: 3px;
+  }
+
+  .nav-links { display: flex; gap: 36px; list-style: none; }
+  .nav-links a {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    color: rgba(200,232,255,0.6);
+    text-decoration: none;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: color 0.3s, text-shadow 0.3s;
+  }
+  .nav-links a:hover { color: var(--cyan); text-shadow: var(--glow); }
+
+  .nav-cta {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    padding: 10px 24px;
+    border: 1px solid var(--cyan);
+    color: var(--cyan);
+    background: transparent;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: none;
+    transition: all 0.3s;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    text-decoration: none;
+  }
+  .nav-cta:hover {
+    background: var(--cyan);
+    color: var(--dark);
+    box-shadow: var(--glow-strong);
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 120px 40px 80px;
+    z-index: 2;
+    overflow: hidden;
+  }
+
+  .hero-bg-circle {
+    position: absolute;
+    width: 700px; height: 700px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,245,255,0.06);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    animation: pulse-ring 4s ease-in-out infinite;
+  }
+  .hero-bg-circle:nth-child(2) {
+    width: 500px; height: 500px;
+    border-color: rgba(123,47,247,0.1);
+    animation-delay: -1s;
+  }
+  .hero-bg-circle:nth-child(3) {
+    width: 900px; height: 900px;
+    border-color: rgba(0,245,255,0.03);
+    animation-delay: -2s;
+  }
+
+  @keyframes pulse-ring {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    50% { transform: translate(-50%, -50%) scale(1.04); opacity: 0.6; }
+  }
+
+  .hero-eyebrow {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    color: var(--cyan);
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.3s;
+  }
+
+  .hero-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(48px, 9vw, 100px);
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -2px;
+    margin-bottom: 12px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.5s;
+  }
+
+  .hero-title .line1 { color: #ffffff; display: block; }
+  .hero-title .line2 {
+    display: block;
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--cyan);
+    text-shadow: none;
+    filter: drop-shadow(0 0 20px rgba(0,245,255,0.5));
+  }
+
+  .hero-year {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(80px, 15vw, 160px);
+    font-weight: 900;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(0,245,255,0.12);
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    letter-spacing: -8px;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  .hero-sub {
+    font-size: 16px;
+    color: rgba(200,232,255,0.5);
+    font-weight: 300;
+    letter-spacing: 1px;
+    margin-bottom: 48px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.7s;
+  }
+
+  .hero-cta-group {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.9s;
+  }
+
+  .btn-primary {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    padding: 16px 40px;
+    background: var(--cyan);
+    color: var(--dark);
+    border: none;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    cursor: none;
+    font-weight: 700;
+    clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-primary:hover {
+    box-shadow: var(--glow-strong);
+    transform: translateY(-2px);
+  }
+
+  .btn-secondary {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    padding: 16px 40px;
+    background: transparent;
+    color: var(--cyan);
+    border: 1px solid rgba(0,245,255,0.4);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    cursor: none;
+    clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-secondary:hover {
+    border-color: var(--cyan);
+    background: rgba(0,245,255,0.05);
+    box-shadow: var(--glow);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    position: relative;
+    z-index: 2;
+    border-top: 1px solid rgba(0,245,255,0.1);
+    border-bottom: 1px solid rgba(0,245,255,0.1);
+    background: rgba(0,245,255,0.02);
+    padding: 40px 60px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+  }
+
+  .stat-item {
+    text-align: center;
+    padding: 20px;
+    border-right: 1px solid rgba(0,245,255,0.08);
+    position: relative;
+  }
+  .stat-item:last-child { border-right: none; }
+
+  .stat-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 36px;
+    font-weight: 900;
+    color: var(--cyan);
+    text-shadow: var(--glow);
+    display: block;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .stat-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: rgba(200,232,255,0.4);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+
+  /* EVENTS */
+  .section {
+    position: relative;
+    z-index: 2;
+    padding: 100px 60px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 60px;
+  }
+
+  .section-tag {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--cyan);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+
+  .section-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -1px;
+  }
+
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(0,245,255,0.3), transparent);
+  }
+
+  .events-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+
+  .event-card {
+    position: relative;
+    padding: 40px 32px;
+    background: rgba(0,245,255,0.02);
+    border: 1px solid rgba(0,245,255,0.08);
+    overflow: hidden;
+    transition: all 0.4s;
+    cursor: none;
+  }
+
+  .event-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+
+  .event-card:hover {
+    background: rgba(0,245,255,0.05);
+    border-color: rgba(0,245,255,0.25);
+    transform: translateY(-4px);
+  }
+  .event-card:hover::before { opacity: 1; }
+
+  .event-icon {
+    font-size: 32px;
+    margin-bottom: 20px;
+    display: block;
+    filter: drop-shadow(0 0 8px rgba(0,245,255,0.5));
+  }
+
+  .event-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    color: rgba(0,245,255,0.4);
+    letter-spacing: 3px;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .event-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+
+  .event-desc {
+    font-size: 13px;
+    color: rgba(200,232,255,0.45);
+    line-height: 1.7;
+  }
+
+  .event-card .corner {
+    position: absolute;
+    bottom: 16px; right: 16px;
+    width: 20px; height: 20px;
+    border-bottom: 1.5px solid rgba(0,245,255,0.3);
+    border-right: 1.5px solid rgba(0,245,255,0.3);
+  }
+
+  /* CYBORG SECTION */
+  .cyborg-section {
+    position: relative;
+    z-index: 2;
+    padding: 100px 60px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+    border-top: 1px solid rgba(0,245,255,0.06);
+  }
+
+  .cyborg-visual {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cyborg-ring {
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,245,255,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    animation: spin-slow 20s linear infinite;
+  }
+
+  .cyborg-ring::before {
+    content: '';
+    position: absolute;
+    inset: -20px;
+    border-radius: 50%;
+    border: 1px dashed rgba(0,245,255,0.08);
+    animation: spin-slow 30s linear infinite reverse;
+  }
+
+  .cyborg-ring::after {
+    content: '';
+    position: absolute;
+    top: -4px; left: 50%;
+    width: 8px; height: 8px;
+    background: var(--cyan);
+    border-radius: 50%;
+    box-shadow: var(--glow-strong);
+    transform: translateX(-50%);
+  }
+
+  @keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .cyborg-core {
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,245,255,0.1) 0%, rgba(123,47,247,0.05) 60%, transparent 100%);
+    border: 1px solid rgba(0,245,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    color: var(--cyan);
+    text-shadow: var(--glow);
+    letter-spacing: 2px;
+    animation: spin-slow 20s linear infinite reverse;
+    text-align: center;
+    line-height: 1.4;
+  }
+
+  .cyborg-content .section-tag { margin-bottom: 16px; display: block; }
+  .cyborg-content .section-title { margin-bottom: 24px; }
+
+  .cyborg-content p {
+    font-size: 15px;
+    color: rgba(200,232,255,0.5);
+    line-height: 1.8;
+    margin-bottom: 20px;
+  }
+
+  .feature-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .feature-list li {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    color: rgba(200,232,255,0.7);
+    letter-spacing: 1px;
+  }
+
+  .feature-list li::before {
+    content: '▶';
+    color: var(--cyan);
+    font-size: 8px;
+    text-shadow: var(--glow);
+    flex-shrink: 0;
+  }
+
+  /* TIMELINE */
+  .timeline-section {
+    position: relative;
+    z-index: 2;
+    padding: 100px 60px;
+    border-top: 1px solid rgba(0,245,255,0.06);
+  }
+
+  .timeline {
+    position: relative;
+    margin-top: 60px;
+    padding-left: 40px;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 1px;
+    background: linear-gradient(180deg, var(--cyan), rgba(0,245,255,0.1));
+  }
+
+  .timeline-item {
+    position: relative;
+    padding: 0 0 50px 40px;
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 40px;
+    align-items: start;
+  }
+
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -4px; top: 6px;
+    width: 9px; height: 9px;
+    background: var(--dark);
+    border: 1.5px solid var(--cyan);
+    border-radius: 50%;
+    box-shadow: var(--glow);
+  }
+
+  .timeline-date {
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    color: var(--cyan);
+    letter-spacing: 2px;
+    padding-top: 2px;
+    opacity: 0.8;
+  }
+
+  .timeline-content h3 {
+    font-family: 'Orbitron', monospace;
+    font-size: 16px;
+    color: #fff;
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+
+  .timeline-content p {
+    font-size: 13px;
+    color: rgba(200,232,255,0.45);
+    line-height: 1.7;
+  }
+
+  /* CTA SECTION */
+  .cta-section {
+    position: relative;
+    z-index: 2;
+    padding: 120px 60px;
+    text-align: center;
+    border-top: 1px solid rgba(0,245,255,0.06);
+    overflow: hidden;
+  }
+
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,245,255,0.04) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .cta-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--cyan);
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    opacity: 0.7;
+  }
+
+  .cta-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(32px, 6vw, 64px);
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 24px;
+  }
+
+  .cta-title span {
+    color: var(--cyan);
+    text-shadow: var(--glow-strong);
+  }
+
+  .cta-sub {
+    font-size: 15px;
+    color: rgba(200,232,255,0.4);
+    margin-bottom: 48px;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* FOOTER */
+  footer {
+    position: relative;
+    z-index: 2;
+    padding: 40px 60px;
+    border-top: 1px solid rgba(0,245,255,0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-logo {
+    font-family: 'Orbitron', monospace;
+    font-size: 14px;
+    font-weight: 900;
+    color: var(--cyan);
+    text-shadow: var(--glow);
+    letter-spacing: 3px;
+  }
+
+  .footer-text {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: rgba(200,232,255,0.25);
+    letter-spacing: 2px;
+  }
+
+  /* Glitch animation on title */
+  .glitch {
+    position: relative;
+    display: inline-block;
+  }
+  .glitch::before, .glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+  }
+  .glitch::before {
+    color: #ff00ff;
+    animation: glitch1 3s infinite;
+    left: 2px;
+  }
+  .glitch::after {
+    color: var(--cyan);
+    animation: glitch2 3s infinite;
+    left: -2px;
+  }
+
+  @keyframes glitch1 {
+    0%, 90%, 100% { transform: translateX(0); opacity: 0; }
+    92% { transform: translateX(-3px); opacity: 0.6; }
+    94% { transform: translateX(3px); opacity: 0.6; }
+    96% { transform: translateX(0); opacity: 0; }
+  }
+  @keyframes glitch2 {
+    0%, 88%, 100% { transform: translateX(0); opacity: 0; }
+    90% { transform: translateX(3px); opacity: 0.5; }
+    92% { transform: translateX(-2px); opacity: 0.5; }
+    94% { transform: translateX(0); opacity: 0; }
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    nav { padding: 16px 24px; }
+    .nav-links { display: none; }
+    .stats-bar { grid-template-columns: repeat(2, 1fr); padding: 30px 24px; }
+    .section { padding: 60px 24px; }
+    .events-grid { grid-template-columns: 1fr; }
+    .cyborg-section { grid-template-columns: 1fr; padding: 60px 24px; }
+    .cyborg-visual { display: none; }
+    .timeline-section { padding: 60px 24px; }
+    .timeline-item { grid-template-columns: 1fr; gap: 8px; }
+    .cta-section { padding: 80px 24px; }
+    footer { padding: 30px 24px; flex-direction: column; gap: 12px; text-align: center; }
+  }
+
+  /* Typing animation for hero eyebrow */
+  .typing {
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 2px solid var(--cyan);
+    animation: typing 2s steps(30, end) 0.5s forwards, blink 0.8s step-end infinite 2.5s;
+    width: 0;
+    display: inline-block;
+  }
+  @keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+  }
+  @keyframes blink {
+    50% { border-color: transparent; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+
+<nav>
+  <div class="nav-logo">TECHFEST</div>
+  <ul class="nav-links">
+    <li><a href="#events">Events</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#timeline">Timeline</a></li>
+    <li><a href="#register">Register</a></li>
+  </ul>
+  <a href="#register" class="nav-cta">Register Now</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-circle"></div>
+  <div class="hero-bg-circle"></div>
+  <div class="hero-bg-circle"></div>
+
+  <div>
+    <p class="hero-eyebrow">
+      <span class="typing">IIT BOMBAY · ASIA'S LARGEST SCI-TECH FESTIVAL</span>
+    </p>
+    <h1 class="hero-title">
+      <span class="line1">TECH</span>
+      <span class="line2 glitch" data-text="FEST">FEST</span>
+    </h1>
+    <p class="hero-sub">Where human potential meets machine precision.<br>December 2026 · IIT Bombay Campus</p>
+    <div class="hero-cta-group">
+      <a href="#register" class="btn-primary">Initialize Registration</a>
+      <a href="#events" class="btn-secondary">Explore Events</a>
+    </div>
+  </div>
+
+  <div class="hero-year">2026</div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <span class="stat-num">1.75L+</span>
+    <span class="stat-label">Attendees</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num">2500+</span>
+    <span class="stat-label">Colleges</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num">500+</span>
+    <span class="stat-label">International</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num">29</span>
+    <span class="stat-label">Years of Legacy</span>
+  </div>
+</div>
+
+<!-- EVENTS -->
+<section class="section" id="events">
+  <div class="section-header">
+    <span class="section-tag">// 01</span>
+    <h2 class="section-title">Core Events</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="events-grid">
+    <div class="event-card">
+      <span class="event-icon">⚔️</span>
+      <span class="event-num">EVT_001</span>
+      <h3 class="event-name">Robowars</h3>
+      <p class="event-desc">Combat robots engineered to destroy. International teams battle inside a bulletproof arena. Only the strongest machine survives.</p>
+      <div class="corner"></div>
+    </div>
+    <div class="event-card">
+      <span class="event-icon">🧠</span>
+      <span class="event-num">EVT_002</span>
+      <h3 class="event-name">AI Hackathon</h3>
+      <p class="event-desc">48 hours. One problem. Unlimited intelligence. Build AI solutions that could change the world — or at least the leaderboard.</p>
+      <div class="corner"></div>
+    </div>
+    <div class="event-card">
+      <span class="event-icon">🚀</span>
+      <span class="event-num">EVT_003</span>
+      <h3 class="event-name">Space Symposium</h3>
+      <p class="event-desc">ISRO scientists. Astronauts. The future of space exploration — live on stage. India's first Space Symposium returns.</p>
+      <div class="corner"></div>
+    </div>
+    <div class="event-card">
+      <span class="event-icon">🛡️</span>
+      <span class="event-num">EVT_004</span>
+      <h3 class="event-name">Defence Expo</h3>
+      <p class="event-desc">DRDO, NSG, and global defence tech on display. Witness laser systems, anti-aircraft guns, and classified innovations.</p>
+      <div class="corner"></div>
+    </div>
+    <div class="event-card">
+      <span class="event-icon">🚁</span>
+      <span class="event-num">EVT_005</span>
+      <h3 class="event-name">Drone Racing</h3>
+      <p class="event-desc">International Drone Racing League. FPV pilots push machines to the limit. Speed. Precision. Zero margin for error.</p>
+      <div class="corner"></div>
+    </div>
+    <div class="event-card">
+      <span class="event-icon">🌐</span>
+      <span class="event-num">EVT_006</span>
+      <h3 class="event-name">Int'l Exhibitions</h3>
+      <p class="event-desc">Humanoid robots from China. Robo DJs from Japan. Cutting-edge innovations from 50+ countries under one roof.</p>
+      <div class="corner"></div>
+    </div>
+  </div>
+</section>
+
+<!-- CYBORG SECTION -->
+<section class="cyborg-section" id="about">
+  <div class="cyborg-visual">
+    <div class="cyborg-ring">
+      <div class="cyborg-core">TECHFEST<br>2026</div>
+    </div>
+  </div>
+  <div class="cyborg-content">
+    <span class="section-tag">// 02 — THE CYBORG PARADIGM</span>
+    <h2 class="section-title">Man Meets<br>Machine</h2>
+    <p>Techfest 2026 operates at the bleeding edge — where human creativity fuses with artificial intelligence, robotics, and space-age engineering.</p>
+    <p>This is not just a festival. It is a simulation of the future. A paradigm where the line between human and machine dissolves.</p>
+    <ul class="feature-list">
+      <li>Keynote lectures from Nobel laureates & industry leaders</li>
+      <li>Live AI demonstrations & interactive robotics</li>
+      <li>International competitions across 20+ domains</li>
+      <li>UNESCO & UNICEF endorsed platform</li>
+      <li>3 days · 1 campus · Infinite possibilities</li>
+    </ul>
+  </div>
+</section>
+
+<!-- TIMELINE -->
+<section class="timeline-section" id="timeline">
+  <div class="section-header">
+    <span class="section-tag">// 03</span>
+    <h2 class="section-title">Mission Timeline</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-date">PHASE 01<br>AUG 2026</div>
+      <div class="timeline-content">
+        <h3>Registrations Open</h3>
+        <p>Early bird access. Secure your slot for competitions, workshops, and passes before they're gone.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">PHASE 02<br>OCT 2026</div>
+      <div class="timeline-content">
+        <h3>Zonals Begin</h3>
+        <p>Regional qualifying rounds across India and internationally. Winners earn a direct pass to IIT Bombay.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-date">PHASE 03<br>DEC 2026</div>
+      <div class="timeline-content">
+        <h3>Main Event — IIT Bombay</h3>
+        <p>3 days. 1.75 lakh minds. The culmination of Asia's largest Sci-Tech festival on the IIT Bombay campus.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="register">
+  <p class="cta-label">System Ready — Awaiting Input</p>
+  <h2 class="cta-title">Are You<br><span>Ready?</span></h2>
+  <p class="cta-sub">Join 1.75 lakh minds at Asia's largest science and technology festival. Your future starts here.</p>
+  <div class="hero-cta-group">
+    <a href="https://techfest.org" target="_blank" class="btn-primary">Access Portal</a>
+    <a href="#events" class="btn-secondary">View Events</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">TECHFEST · IIT BOMBAY</div>
+  <div class="footer-text">SYSTEM VERSION 2026.1 · ALL SYSTEMS OPERATIONAL · TECHFEST.ORG</div>
+</footer>
+
+<script>
+  const cursor = document.getElementById('cursor');
+  const dot = document.getElementById('cursorDot');
+  let mx = 0, my = 0, cx = 0, cy = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    dot.style.left = mx + 'px';
+    dot.style.top = my + 'px';
+  });
+
+  function animateCursor() {
+    cx += (mx - cx) * 0.15;
+    cy += (my - cy) *.15;
+    cursor.style.left = (cx - 8) + 'px';
+    cursor.style.top = (cy - 8) + 'px';
+    requestAnimationFrame(animateCursor);
+  }
+  animateCursor();
+
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.style.transform = 'scale(2.5)');
+    el.addEventListener('mouseleave', () => cursor.style.transform = 'scale(1)');
+  });
+
+  // Scroll reveal
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.event-card, .stat-item, .timeline-item').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(24px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(el);
+  });
+
+  // Counter animation
+  document.querySelectorAll('.stat-num').forEach(el => {
+    const text = el.textContent;
+    const num = parseFloat(text.replace(/[^0-9.]/g, ''));
+    const suffix = text.replace(/[0-9.]/g, '');
+    let start = 0;
+    const step = num / 60;
+    const timer = setInterval(() => {
+      start += step;
+      if (start >= num) { start = num; clearInterval(timer); }
+      el.textContent = (Number.isInteger(num) ? Math.floor(start) : start.toFixed(2)) + suffix;
+    }, 24);
+  });
+</script>
+</body>
+</html>
